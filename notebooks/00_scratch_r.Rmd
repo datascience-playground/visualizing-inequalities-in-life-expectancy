@@ -8,16 +8,69 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-```{r}
+```{r, echo=FALSE}
 library(dplyr)
-library(ggplot2)
 library(tidyr)
-library(data.table)
-library(corrplot)
-library(gridExtra)
-library(ggthemes)
+library(ggplot2)
+```
+
+## Global defaults
+
+```{r}
+options(repr.plot.width = 6, repr.plot.height = 6)
 
 ```
+
+
+## Utility functions
+
+```{r}
+# TODO refactor this 
+print_ln <- function() {
+  cat(  "--------------------------------------------------------------------------------\n"  )
+}
+```
+
+
+```{r}
+life_expectancy <- read.csv("../data/raw/UNdata_Export_20200411_102825637.csv", stringsAsFactors = FALSE)
+
+```
+
+
+```{r}
+
+subdata <- life_expectancy %>% 
+  filter(Year=="2000-2005") %>%
+  select(Country.or.Area, Subgroup, Value) %>%
+  spread(Subgroup, Value)
+
+```
+
+
+
+```{r}
+head(subdata, 10) %>%
+  ggplot(aes(x = Male, y = Female)) +
+  geom_point() 
+
+```
+
+
+```{r}
+head(subdata, 10) %>%
+  ggplot(aes(x = Male, y = Female)) +
+  scale_x_continuous(limits=c(35,85)) +
+  scale_y_continuous(limits=c(35,85)) +
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0, linetype = 2) + 
+  xlab("Males") +
+  ylab("Females") +
+  labs(title = "Life Expectancy at Birth by Country", caption = "Source: United Nations Statistics Division")
+
+
+```
+
 
 ```{r}
 
@@ -25,11 +78,92 @@ library(ggthemes)
 ```
 
 
-## Including Plots
+```{r}
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
 ```
 
