@@ -1,0 +1,245 @@
+---
+title: "1.0-rmd-sm-data-exploration"
+author: "Sarvam"
+date: "4/10/2020"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = normalizePath("/home/sarvammittal/projects/Life_Expectancy/https:/github.com/datascience-practice-projects/Visualizing-Inequalities-in-Life-Expectancy.git"))  
+
+#Knitr, by default, looks in the same directory as our .Rmd file to find any files we need to draw in, like data sets or script files. If we keep our data files and scripts in separate folders (and we should) we need to configure knitr.It loads the knitr package and sets root.dir to our project folder. Knitr will now look for all files from this root folder rather than the folder it is stored in.
+```
+
+```{python}
+import os
+os.chdir("/home/sarvammittal/projects/Life_Expectancy/https:/github.com/datascience-practice-projects/Visualizing-Inequalities-in-Life-Expectancy.git")
+
+#To change the current working directory to specified path
+```
+
+# Life Expectancy
+
+#Life expectancy is a statistical measure of the average time an organism is expected to live, based on the year of its birth, its current age and other demographic factors including gender.
+
+```{python}
+#Importing the libraries
+
+import numpy as np 
+import pandas as pd 
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+#Ignore Warnings
+import warnings
+warnings.filterwarnings('ignore')
+sns.set_style('whitegrid')
+sns.set_context('paper')
+
+# Pandas options
+pd.set_option('display.max_colwidth', 1000, 'display.max_rows', None, 'display.max_columns', None)
+
+# Plotting options
+#%matplotlib inline
+plt.style.use('ggplot')
+sns.set(style='whitegrid')
+
+def print_ln():
+    print('-' * 80, '\n')
+```
+
+# Exploratory data analysis
+```{python}
+#reading the csv
+df = pd.read_csv('./data/raw/UNdata.csv')
+df.head()
+```
+```{python}
+list(df.columns)
+#Country or Area: Name of the country
+#Subgroup: Gender
+#Year: Range of Years of a particular country for which data is recorded
+#Source: From where this data is taken 
+#Unit: Unit of Year column 
+#Value: Life expectancy value 
+#Value Footnotes : NaN
+#We have to remane Country or Area to Country, Subgroup to gender
+#We have to drop Unit and Value Footnotes Column
+```
+
+```{python}
+#renaming the columns
+df = df.rename(columns = {"Country or Area": "Country", 
+                                  "Subgroup":"Gender"}) 
+df.head()
+```
+
+```{python}
+#dropping the columns which are not of any use
+df=df.drop(['Unit','Value Footnotes','Source'], axis = 1) 
+df.head()
+```
+
+```{python}
+#checking the null values
+round(100*(df.isnull().sum()/len(df.index)), 2)
+#Year and Value columns has 11 values as null.We can leave them as they are very less in ratio leass than 1%
+```
+
+```{python}
+#it has 1571 rows and 5 columns
+df.shape
+```
+```{python}
+#coulmn wise describe
+print(df.Country.describe()); print_ln()
+print(df.Gender.describe()); print_ln()
+print(df.Year.describe()); print_ln()
+print(df.Value.describe());print_ln()
+
+```
+
+```{python}
+#Task according to datacamp
+#Task1
+#1.1)Filter life_expectancy to obtain all records such as Year is equal to 2000-2005.
+life_expectancy = df.loc[df['Year'] == '2000-2005']
+life_expectancy.head()
+```
+```{python}
+#1.2)Subset the dataset to include just three columns: Country.or.Area, Subgroup, and Value.
+#here we have already rename the columns ie Country or Area to Country, Subgroup to Gender
+life_expectancy=life_expectancy.filter(["Country", "Gender", "Value"])
+life_expectancy.head()
+```
+```{python}
+#1.3)Convert Subgroup into two other columns called Female and Male, reshaping dataset from long to wide.
+#1.4)Print the first rows of the resulting dataset.
+life_expectancy = life_expectancy.pivot_table(index=['Country'],columns='Gender',values='Value',fill_value=0)
+life_expectancy.head()
+
+
+```
+```{python}
+#resetting the index of pivot tabel
+life_expectancy = life_expectancy.reset_index()
+life_expectancy.head()
+```
+```{python}
+#Interactive graph using plotly
+import plotly.express as px
+
+fig = px.scatter(life_expectancy, x="Male", y="Female",
+                 hover_name="Country", log_x=True, size_max=60)
+fig.show()
+```
+
+# Task 2
+#Use the ggplot function to initialize a ggplot object. Declare subdata as the input data frame and set the aesthetics to represent Male on the x-axis and Female on the y-axis.
+#Add a layer to represent observations with points using geom_point.
+
+```{python}
+from plotnine import *
+p = ggplot(aes(x='Male', y='Female'), data=life_expectancy)
+# Add layers
+p + geom_point()
+# Add a line 
+p + geom_point() + geom_line()
+# Add a trend line
+p + geom_point() + geom_line() + stat_smooth(color='blue')
+
+```
+```{python}
+
+ggplot(life_expectancy, aes(x='Male', y='Female')) + \
+    geom_point(colour="black", alpha=.55, size=5) + \
+    ggtitle("Life Expectancy at Birth by Country")+ \
+    geom_abline(slope=1, intercept=0, color='steelblue')
+```
+```{python}
+# checking the original df
+df.head()
+```
+
+```{python}
+#filtering out 1985-2000 and 2000-2005 data
+subsetDataFrame = df[df['Year'].isin(['2000-2005', '1995-2000']) ]
+subsetDataFrame.head()
+```
+
+#Task3
+#Convert Year into four other columns called Female_2000_2005, Female_1985_1990, Male_2000_2005 and Male_1985_1990, reshaping dataset from long to wide.
+```{python}
+life_expectancy2 = (subsetDataFrame.pivot_table(index=['Country'], columns=['Gender', 'Year'],fill_value=0))
+life_expectancy2.head()
+```
+
+```{python}
+life_expectancy2.columns = ["_".join(v) for v in life_expectancy2.columns.values]
+life_expectancy2.head()
+```
+```{python}
+list(life_expectancy2.columns)
+```
+
+```{python}
+life_expectancy2=pd.DataFrame(life_expectancy2)
+life_expectancy2.head()
+```
+```{python}
+life_expectancy2 = life_expectancy2.reset_index()
+life_expectancy2.head()
+```
+```{python}
+list(life_expectancy2.columns)
+```
+```{python}
+life_expectancy2.head()
+
+```
+
+```{python}
+life_expectancy2['diff_Female']= life_expectancy2['Value_Female_2000-2005']-life_expectancy2['Value_Female_1995-2000']
+life_expectancy2['diff_Male']= life_expectancy2['Value_Male_2000-2005']-life_expectancy2['Value_Male_1995-2000']
+life_expectancy2.head()
+```
+```{python}
+#Interactive graph using plotly
+import plotly.express as px
+
+fig = px.scatter(life_expectancy2, x="diff_Male", y="diff_Female",
+                 hover_name="Country", log_x=True, size_max=60)
+fig.show()
+```
+
+```{python}
+from plotnine import *
+p = ggplot(aes(x='diff_Male', y='diff_Female'), data=life_expectancy2)
+# Add layers
+p + geom_point()
+# Add a line 
+p + geom_point() + geom_line()
+# Add a trend line
+p + geom_point() + geom_line() + stat_smooth(color='blue')
+
+```
+
+```{python}
+
+ggplot(life_expectancy2, aes(x='diff_Male', y='diff_Female')) + \
+    geom_point(colour="black", alpha=.55, size=5) + \
+    ggtitle("Life Expectancy at Birth by Country between 1985-2000")+ \
+    geom_abline(slope=1, intercept=0, color='steelblue')
+```
+```{python}
+plot = sns.scatterplot(x='diff_Male', y='diff_Female', hue=None, style=None, size=None, data=life_expectancy2, palette=None, hue_order=None, hue_norm=None, sizes=None, size_order=None, size_norm=None, markers=True, style_order=None, x_bins=None, y_bins=None, units=None, estimator=None, ci=95, n_boot=1000, alpha='auto', x_jitter=None, y_jitter=None, legend='brief', ax=None)
+plot
+```
+
+
+
+
+
+
