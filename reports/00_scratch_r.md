@@ -1,68 +1,51 @@
----
-title: "00_scratch_r"
-output:
-#  html_document: default
-  pdf_document: default
-#  md_document:
-#    variant: markdown_github
+    ## 
+    ## Attaching package: 'dplyr'
 
----
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
 
+Global defaults
+---------------
 
-```{r, echo=FALSE}
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-```
-
-## Global defaults
-
-```{r}
+``` r
 options(repr.plot.width = 6, repr.plot.height = 6)
-
 ```
 
+Utility functions
+-----------------
 
-## Utility functions
-
-```{r}
+``` r
 # TODO refactor this 
 print_ln <- function() {
   cat(  "--------------------------------------------------------------------------------\n"  )
 }
 ```
 
-
-```{r}
+``` r
 life_expectancy <- read.csv("../data/raw/UNdata_Export_20200411_102825637.csv", stringsAsFactors = FALSE)
-
 ```
 
-
-```{r}
-
+``` r
 subdata <- life_expectancy %>% 
   filter(Year=="2000-2005") %>%
   select(Country.or.Area, Subgroup, Value) %>%
   spread(Subgroup, Value)
-
 ```
 
-
-
-```{r}
+``` r
   subdata %>%
   ggplot(aes(x = Male, y = Female)) +
   geom_point() 
-
 ```
 
+![](00_scratch_r_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
-```{r}
+``` r
   subdata %>%
   ggplot(aes(x = Male, y = Female)) +
   scale_x_continuous(limits=c(35,85)) +
@@ -72,12 +55,11 @@ subdata <- life_expectancy %>%
   xlab("Males") +
   ylab("Females") +
   labs(title = "Life Expectancy at Birth by Country", caption = "Source: United Nations Statistics Division")
-
-
 ```
 
+![](00_scratch_r_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
-```{r}
+``` r
 top_male <- subdata %>% arrange(Male-Female) %>% head(3)
 top_female <- subdata %>% arrange(Female-Male) %>% head(3)
 
@@ -94,11 +76,11 @@ ggplot(subdata, aes(x=Male, y=Female, label= Country.or.Area))+
        caption="Source: United Nations Statistics Division",
        x="Males",
        y="Females")
-
 ```
 
+![](00_scratch_r_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
-```{r}
+``` r
 subdata2 <- life_expectancy %>% 
   filter(Year %in% c("1985-1990", "2000-2005")) %>% 
   mutate(Sub_Year=paste(Subgroup, Year, sep="_")) %>% 
@@ -107,11 +89,9 @@ subdata2 <- life_expectancy %>%
   select(-Subgroup, -Year)  %>%
   spread(Sub_Year, Value) %>%
   mutate(diff_Female = Female_2000_2005 - Female_1985_1990, diff_Male = Male_2000_2005 - Male_1985_1990 )
-  
 ```
 
-
-```{r}
+``` r
 ggplot(subdata2, aes(x= diff_Male, y=diff_Female, label=Country.or.Area))+
   geom_point(colour="white", fill="chartreuse3", shape=21, alpha=.55, size=5)+
   geom_abline(intercept = 0, slope = 1, linetype=2)+ 
@@ -125,12 +105,11 @@ ggplot(subdata2, aes(x= diff_Male, y=diff_Female, label=Country.or.Area))+
        caption="Source: United Nations Statistics Division",
        x="Males",
        y="Females")
-
 ```
 
+![](00_scratch_r_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
-```{r}
-
+``` r
 top <- subdata2 %>% arrange(diff_Male+diff_Female) %>% head(3)
 bottom <- subdata2 %>% arrange(-(diff_Male+diff_Female)) %>% tail(3)
 
@@ -149,75 +128,4 @@ ggplot(subdata2, aes(x=diff_Male, y=diff_Female, label=Country.or.Area), guide=F
   theme_bw()
 ```
 
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
+![](00_scratch_r_files/figure-markdown_github/unnamed-chunk-11-1.png)
