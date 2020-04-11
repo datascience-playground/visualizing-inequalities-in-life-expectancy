@@ -1,0 +1,35 @@
+---
+title: "00_scratch_r"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(data.table)
+library(corrplot)
+library(gridExtra)
+library(ggthemes)
+
+```
+
+```{r}
+
+
+```
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
